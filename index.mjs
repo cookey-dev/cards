@@ -6,6 +6,7 @@ import { readFileSync as rf } from 'node:fs';
 
 const app = express();
 app.use(express.static('static'));
+
 const server = http.createServer(app);
 const io = new Server(server);
 const peer = ExpressPeerServer(server, {
