@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<title>Join a room</title>
+		<link rel="stylesheet" href="join.css">
+		<link rel="icon" type="image/png" href="/img/favicon.png">
+		<script src="https://kit.fontawesome.com/e7c4dda021.js" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<h1 id="title">Rooms</h1>
+		<input type="text" placeholder="Room name" id="name">
+		<h2>Reload page for new rooms, click a room to join</h2>
+		<div id="pcont">
+			<div id="prompt">
+				<h1 id="phead">Username</h1>
+				<input type="text" placeholder="Username" id="pinput"><br><br>
+				<button id="submit">Submit</button>
+			</div>
+		</div>
+		<ul id="rooms">Loading rooms...</ul>
+		<script src="loadpacks.js"></script>
+		<script src="join.js"></script>
+	</body>
+</html>

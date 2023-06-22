@@ -1,0 +1,3 @@
+- Implement basics
+- Implement graphics
+- Remove jQuery dependency for AJAX (easy)

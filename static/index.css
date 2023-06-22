@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+@keyframes drop {
+  0% {
+	  transform: translateY(-40vh) scaleY(0.9);
+	  opacity: 0;
+  }
+  5% {
+	  opacity: 0;
+  }
+  50% {
+	  transform: translateY(0px) scaleY(1);
+	  opacity: .7;
+  }
+  65% {
+	  transform: translateY(-17px) scaleY(.9);
+	  opacity: 1;
+  }
+  75% {
+	  transform: translateY(-22px) scaleY(.9);
+	  opacity: 1;
+  }
+  100% {
+	  transform: translateY(0px) scaleY(1);
+	  opacity: 1;
+  }
+}
+
+@keyframes show {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes zbounce {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(0.9);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes hidetitle {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
+
+* {
+	font-family: 'Roboto', sans-serif;
+	color: white;
+}
+
+body {
+	background-color: black;
+	margin: 0px;
+}
+
+div#title {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	text-align: center;
+}
+div#title > h1 {
+	font-size: 20vh;
+}
+div#title > h1 > :nth-child(1) {
+	opacity: 0;
+	position: relative;
+	display: inline-block;
+	animation: drop .4s linear forwards;
+}
+div#title > h1 > :nth-child(2) {
+	opacity: 0;
+	position: relative;
+	display: inline-block;
+	animation: drop .4s linear forwards .2s;
+}
+div#title > h1 > :nth-child(3) {
+	opacity: 0;
+	position: relative;
+	display: inline-block;
+	animation: drop .4s linear forwards .4s;
+}
+div#title > h3 {
+	position: relative;
+	opacity: 0;
+	animation: zbounce 1s ease-in-out infinite, show .5s linear forwards .8s;
+}
+div#title > button {
+	background-color: #222222;
+	border-radius: 5px;
+	padding: 3px 15px 3px 15px;
+	border: none;
+	opacity: 0;
+	animation: show .5s linear forwards 1.3s;
+	transition-duration: 0.3s;
+}
+div#title > button:hover {
+	transform: scale(1.3);
+}
+div#title > button > h1 {
+	margin: 0px;
+}
+
+@keyframes showgame {
+	from {
+		opacity: 0;
+		transform: scale(0);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+div#game {
+	display: none;
+	opacity: 0;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+}
+
+button#start {
+	background-color: #222222;
+	border-radius: 5px;
+	padding: 3px 15px 3px 15px;
+	border: none;
+	font-size: 2vh;
+	transition-duration: 0.3s;
+}
+button#start:hover {
+	transform: scale(1.3);
+}
+
+input[type=text] {
+	border-radius: 4px;
+	border: 2px solid black;
+	color: black !important;
+}
