@@ -1,8 +1,10 @@
 class Cards {
 	black;
 	hand;
+	conn;
 	constructor() {
 		this.hand = [];
+		this.conn = null;
 	}
 	deal(hand) {
 		this.hand = hand;
@@ -16,6 +18,7 @@ class Cards {
 		}
 	}
 	handle(d, conn) {
+		if (this.conn === null) this.conn = conn;
 		if (d.type === 'deal') this.deal(d.hand);
 	}
 }

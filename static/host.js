@@ -26,7 +26,7 @@ const peer = new Peer({
         		urls: "turn:a.relay.metered.ca:443?transport=tcp",
         		username: "127830d23d52b2e9695b8315",
         		credential: "9pgi6e1b428bcz55",
-      		},
+      		}
   		],
 	}
 });
@@ -67,9 +67,11 @@ const cds = new Cards(pList);
 const sock = io();
 
 peer.on('open', async id => {
+	// Pre-game
 	info = JSON.parse(decodeURIComponent(atob(new URL(window.location.href).searchParams.get('i'))));
 	document.querySelector('title').innerText = `Hosting ${info.name}`;
 	const log = document.querySelector('p#info');
+	
 	sock.on('error', err => {
 		alert(err);
 		window.location.reload();
@@ -80,6 +82,7 @@ peer.on('open', async id => {
 		name: info.name,
 		encrypted: false
 	});
+	
 	peer.on('connection', conn => {
 		var init = false;
 		console.log(conn.peer);
@@ -105,6 +108,7 @@ peer.on('open', async id => {
 			}
 		});
 	});
+	
 	var joinUrl = new URL(window.location.href);
 	joinUrl.pathname = '/join';
 	joinUrl.search = `?id=${id}`;
@@ -113,6 +117,8 @@ peer.on('open', async id => {
 	copyJoinLink = () => {
 		navigator.clipboard.writeText(joinUrl);
 	}
+
+	// Load packs
 	log.innerText = 'Loading packs'
 	await loadPacks(info.packs, log);
 });

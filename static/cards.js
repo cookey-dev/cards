@@ -1,6 +1,7 @@
 class Cards {
 	pList;
 	black;
+	czar;
 	constructor(pList) {
 		this.pList = pList;
 	}

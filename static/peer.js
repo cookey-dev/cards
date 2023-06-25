@@ -26,13 +26,15 @@ const peer = new Peer({
         		urls: "turn:a.relay.metered.ca:443?transport=tcp",
         		username: "127830d23d52b2e9695b8315",
         		credential: "9pgi6e1b428bcz55",
-      		},
+      		}
   		],
 	}
 });
+var cds;
 peer.on('open', async id => {
 	const search = new URL(window.location.href).searchParams;
 	console.log(id);
+	cds = new Cards();
 	const conn = peer.connect(search.get('id'));
 	await new Promise(r => conn.on('open', r));
 	conn.on('close', () => {
@@ -40,6 +42,7 @@ peer.on('open', async id => {
 	});
 	conn.on('data', d => {
 		console.log(d);
+		cds.handle(d, conn);
 	});
 	conn.send({
 		name: decodeURIComponent(search.get('name'))
