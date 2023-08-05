@@ -19,7 +19,7 @@ class Cards {
 	}
 	deal() {
 		for (var id of [...this.pList.keys()]) {
-			this.pList.get(id).hand = [...Array(10)].map(i => this.getWhiteCard());
+			this.pList.get(id).hand = [...Array(10)].map(() => this.getWhiteCard());
 			this.pList.get(id).conn.send({
 				type: 'deal',
 				hand: this.pList.get(id).hand
@@ -27,6 +27,15 @@ class Cards {
 		}
 	}
 	handle(d, conn) {
-		
+		switch (d.type) {
+			case 'name':
+				pList.set(conn.peer, {
+					conn,
+					id: conn.peer,
+					name: d.name,
+					hand: []
+				});
+				updPList();
+		}
 	}
 }

@@ -33,34 +33,6 @@ const peer = new Peer({
 
 var info;
 
-const pList = new Map();
-function rmPList(id) {
-	pList.get(id).conn.close();
-}
-function updPList() {
-	const el = document.querySelector('ul#plist');
-	el.textContent = '';
-	if ([...pList.values()].length < 1) {
-		var e = document.createElement('li');
-		var txt = document.createTextNode('Empty :(');
-		e.appendChild(txt);
-		el.appendChild(e);
-	}
-	for (var p of [...pList.values()]) {
-		var e = document.createElement('li');
-		var txt = document.createTextNode(p.name);
-		var btn = document.createElement('button');
-		btn.className = 'kick';
-		btn.onclick = () => {
-			rmPList(p.id);
-		}
-		btn.innerText = 'Kick'
-		e.appendChild(txt);
-		e.appendChild(btn);
-		el.appendChild(e);
-	}
-}
-
 var joinAsPeer;
 var copyJoinLink;
 const cds = new Cards(pList);
@@ -84,7 +56,6 @@ peer.on('open', async id => {
 	});
 	
 	peer.on('connection', conn => {
-		var init = false;
 		console.log(conn.peer);
 		conn.on('close', () => {
 			if (pList.get(conn.peer)) {
@@ -94,18 +65,7 @@ peer.on('open', async id => {
 		});
 		conn.on('data', d => {
 			console.log(d);
-			if (!init && d.name) {
-				init = true;
-				pList.set(conn.peer, {
-					conn,
-					id: conn.peer,
-					name: d.name,
-					hand: []
-				});
-				updPList();
-			} else {
-				cds.handle(d, conn);
-			}
+			cds.handle(d, conn);
 		});
 	});
 	

@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+	font-family: 'Roboto', sans-serif;
+	color: black;
+}
+
 body {
 	background-color: #505050;
 }
@@ -10,17 +17,46 @@ body {
 		bottom: 75vh;
 	}
 }
+@keyframes raisecard {
+	from {
+		transform: translateY(0%);
+	}
+	to {
+		transform: translateY(-20%);
+	}
+}
+@keyframes raisecard {
+	from {
+		transform: translateY(-20%);
+	}
+	to {
+		transform: translateY(0%);
+	}
+}
 
 div.card {
 	display: inline-block;
+	position: absolute;
 	border-radius: 10px;
-	box-shadow: -0.3vw 0.3vw 5px #1C1C1C;
-	width: 8vw;
-	height: 10vw;
+	box-shadow: 0 0 10px #1C1C1C;
+	width: 10vw;
+	height: 15vw;
 	transition-duration: 0.3s;
-	left: 50%;
-	margin-left: 10px;
+	transform-origin: center 120%;
+	font-size: 2vh;
+	padding: 1vh;
+	padding-right: 2vw;
 }
 div.card.white {
 	background-color: white;
+}
+
+div#hand {
+	position: absolute;
+	height: 50%;
+	width: 100%;
+	top: 50%;
+	display: flex;
+	justify-content: center;
+	left: 0px;
 }
