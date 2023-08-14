@@ -25,3 +25,31 @@ function updPList() {
 		el.appendChild(e);
 	}
 }
+function pListConflict(d, conn) {
+	if (pList.get(conn.peer)) {
+		conn.send({
+			type: 'sys_kick',
+			reason: 'Conflicting id (Internal error)'
+		});
+		conn.close();
+		return true;
+	} else if ([...pList.values()].map(p => p.name).includes(d.name)) {
+		conn.send({
+			type: 'name_conflict'
+		});
+		return true;
+	} else if (d.name == 'dev_kicktest') {
+		console.log('kicktest');
+		console.log(conn.peer);
+		conn.send({
+			type: 'sys_kick',
+			reason: 'get kicked bogo'
+		});
+		return true;
+	}
+	conn.send({
+		type: 'info',
+		info: 'Connected successfully'
+	});
+	return false;
+}

@@ -1,6 +1,7 @@
 import http from 'node:http';
 import express from 'express';
 import { Server } from 'socket.io';
+import Database from '@replit/database';
 import { ExpressPeerServer } from 'peer';
 import { readFileSync as rf } from 'node:fs';
 
@@ -16,7 +17,7 @@ const peer = ExpressPeerServer(server, {
 });
 app.use("/peer", peer);
 
-var hosts = {};
+var hosts = new Database();
 app.get('/', (req, res) => {
 	res.set('Content-Type', 'text/html');
 	res.send(rf('index.html', 'utf8'));

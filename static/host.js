@@ -58,10 +58,7 @@ peer.on('open', async id => {
 	peer.on('connection', conn => {
 		console.log(conn.peer);
 		conn.on('close', () => {
-			if (pList.get(conn.peer)) {
-				pList.delete(conn.peer);
-				updPList();
-			}
+			cds.remove(conn);
 		});
 		conn.on('data', d => {
 			console.log(d);

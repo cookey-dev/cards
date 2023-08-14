@@ -26,9 +26,21 @@ class Cards {
 			});
 		}
 	}
+	remove(conn) {
+		if (pList.get(conn.peer)) {
+			pList.delete(conn.peer);
+			updPList();
+		}
+	}
 	handle(d, conn) {
-		switch (d.type) {
+		sw: switch (d.type) {
 			case 'name':
+				if (pListConflict(d, conn)) {
+					setTimeout(() => {
+						if (pList.get(conn.peer)) conn.close();
+					}, 10000);
+					break sw;
+				}
 				pList.set(conn.peer, {
 					conn,
 					id: conn.peer,
@@ -36,6 +48,7 @@ class Cards {
 					hand: []
 				});
 				updPList();
+				break;
 		}
 	}
 }

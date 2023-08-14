@@ -36,10 +36,8 @@ peer.on('open', async id => {
 	var cds = new Cards();
 	const conn = peer.connect(search.get('id'));
 	await new Promise(r => conn.on('open', r));
-	conn.on('close', () => {
-		alert('Kicked');
-	});
 	conn.on('data', d => {
+		console.log(d);
 		cds.handle(d, conn);
 	});
 	conn.send({

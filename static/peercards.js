@@ -1,3 +1,5 @@
+const notifs = new Notifs();
+
 class Cards {
 	black;
 	hand;
@@ -64,6 +66,24 @@ class Cards {
 		console.log(d);
 		if (this.conn === null) this.conn = conn;
 		switch (d.type) {
+			case 'sys_kick':
+				console.error('sys kicked');
+				notifs.error(`Kicked: ${d.reason}`);
+				conn.close();
+				break;
+			case 'name_conflict':
+				notifs.error('Name is taken, redirecting to the join page in 5 seconds');
+				setTimeout(() => {
+					var joinUrl = new URL(window.location.href);
+					joinUrl.pathname = '/join';
+					joinUrl.search = `?id=${conn.peer}`;
+					window.location.href = joinUrl.href;
+				}, 5000);
+				break;
+			case 'info':
+				console.log(d.info);
+				notifs.info(d.info);
+				break;
 			case 'deal':
 				this.deal(d.hand);
 				break;
