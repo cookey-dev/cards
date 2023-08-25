@@ -14,11 +14,20 @@
 		<ul id="plist">
 			<li>Empty :(</li>
 		</ul>
-		<p id="info">Starting room...</p>
 		<button class="btn" onclick="copyJoinLink()">Copy join link</button><br>
 		<button class="btn" onclick="joinAsPeer()">Join game</button><br>
 		<button class="btn" onclick="start()">Start game</button>
+		<div id="pcont">
+			<div id="prompt">
+				<h1 id="phead">Kick</h1>
+				<input type="text" placeholder="Reason" id="pinput"><br><br>
+				<button id="submit">Submit</button>
+			</div>
+		</div>
+		<h2>Log</h2>
+		<div id="log"></div>
 		<script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.0/client-dist/socket.io.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/cookey-dev/notifs@latest/notifs.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/peerjs@1/dist/peerjs.min.js"></script>
 		<script src="loadpacks.js"></script>
 		<script src="plist.js"></script>

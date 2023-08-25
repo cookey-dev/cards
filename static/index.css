@@ -102,13 +102,12 @@ div#title > h3 {
 	opacity: 0;
 	animation: zbounce 1s ease-in-out infinite, show .5s linear forwards .8s;
 }
-div#title > button {
+/*div#title > button {
 	background-color: #222222;
 	border-radius: 5px;
 	padding: 3px 15px 3px 15px;
 	border: none;
-	opacity: 0;
-	animation: show .5s linear forwards 1.3s;
+	
 	transition-duration: 0.3s;
 }
 div#title > button:hover {
@@ -116,6 +115,13 @@ div#title > button:hover {
 }
 div#title > button > h1 {
 	margin: 0px;
+}*/
+button.btn > h1 {
+	margin: 0px;
+}
+div#title > button, div#title > a > button {
+	opacity: 0;
+	animation: show .5s linear forwards 1.3s;
 }
 
 @keyframes showgame {
@@ -137,7 +143,7 @@ div#game {
 	height: 100%;
 }
 
-button#start {
+button.btn {
 	background-color: #222222;
 	border-radius: 5px;
 	padding: 3px 15px 3px 15px;
@@ -145,7 +151,7 @@ button#start {
 	font-size: 2vh;
 	transition-duration: 0.3s;
 }
-button#start:hover {
+button.btn:hover {
 	transform: scale(1.3);
 }
 

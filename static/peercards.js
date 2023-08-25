@@ -1,4 +1,5 @@
-const notifs = new Notifs();
+var notifs;
+window.addEventListener('load', () => { notifs = new Notifs(); });
 
 class Cards {
 	black;
@@ -62,6 +63,15 @@ class Cards {
 				ch.style.transitionDuration = '0.0s';;
 		}, 300);
 	}
+	redirJoin(conn) {
+		notifs.info('Redirecting to the join page in 5 seconds');
+		setTimeout(() => {
+			var joinUrl = new URL(window.location.href);
+			joinUrl.pathname = '/join';
+			joinUrl.search = `?id=${conn.peer}`;
+			window.location.href = joinUrl.href;
+		}, 5000);
+	}
 	handle(d, conn) {
 		console.log(d);
 		if (this.conn === null) this.conn = conn;
@@ -70,15 +80,17 @@ class Cards {
 				console.error('sys kicked');
 				notifs.error(`Kicked: ${d.reason}`);
 				conn.close();
+				this.redirJoin(conn);
+				break;
+			case 'kick':
+				console.error('kicked');
+				notifs.error(`Kicked: ${d.reason}`);
+				conn.close();
+				this.redirJoin(conn);
 				break;
 			case 'name_conflict':
-				notifs.error('Name is taken, redirecting to the join page in 5 seconds');
-				setTimeout(() => {
-					var joinUrl = new URL(window.location.href);
-					joinUrl.pathname = '/join';
-					joinUrl.search = `?id=${conn.peer}`;
-					window.location.href = joinUrl.href;
-				}, 5000);
+				notifs.warn('Name is taken');
+				notifs
 				break;
 			case 'info':
 				console.log(d.info);

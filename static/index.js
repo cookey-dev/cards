@@ -1,14 +1,15 @@
-window.onload = () => loadPacks().then(() => {
-	const game = document.querySelector('div#game');
-	const stats = document.querySelector('div#game > p#stats');
-	stats.innerText = `Packs: ${packs.official.length} official, ${packs.unofficial.length} unofficial`;
-});
+var notifs;
+var turn = false;
+window.onload = () => {
+	notifs = new Notifs();
+	loadPacks().then(() => {
+		const game = document.querySelector('div#game');
+		const stats = document.querySelector('div#game > p#stats');
+		stats.innerText = `Packs: ${packs.official.length} official, ${packs.unofficial.length} unofficial`;
+	});
+}
 
 const deconcat = (src, rem) => src.filter(it => !rem.includes(it));
-
-function join() {
-	window.location.pathname = '/join';
-}
 
 function base(el) {
 	const sets = ['cahbaseset.json'];
@@ -64,6 +65,20 @@ function play() {
 		game.style.animation = 'showgame .2s linear forwards';
 	}, 200);
 }
+
+var turnNotif = true;
+function eTurn(el) {
+	if (turnNotif && el.checked) {
+		notifs.info('Enabling TURN may fix connection issues (eg. connections thru VPNs). Do not enable unless necessary.');
+		turnNotif = false;
+	}
+	turn = el.checked;
+}
+
+function clrPcks() {
+	for (var p of document.querySelectorAll('input.pck')) p.checked = false;
+}
+
 function start() {
 	if (packsUse.length < 1) {
 		alert('You must select at least one pack');
@@ -81,7 +96,7 @@ function start() {
 	info = btoa(encodeURIComponent(JSON.stringify(info)));
 	var url = new URL(window.location.href);
 	url.pathname = '/host';
-	url.search = `?i=${info}`;
+	url.search = `?i=${info}` + (turn ? '&turn=1' : '');
 	document.querySelector('div#game').style.animation = 'hidetitle .2s linear forwards';
 	window.location.href = url.href;
 }

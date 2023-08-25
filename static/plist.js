@@ -1,6 +1,41 @@
 const pList = new Map();
 function rmPList(id) {
 	pList.get(id).conn.close();
+	pList.delete(id);
+	updPList();
+}
+function pListKick(id) {
+	const conn = pList.get(id).conn;
+	const cont = document.querySelector('div#pcont');
+	const prompt = document.querySelector('div#prompt');
+	const head = document.querySelector('h1#phead');
+	const input = document.querySelector('input#pinput');
+	const submit = document.querySelector('button#submit');
+	head.innerText = `Kick ${pList.get(id).name}`;
+	input.addEventListener('keypress', ev => {
+		if (ev.key.toLowerCase() == 'enter') {
+			ev.preventDefault();
+			submit.click();
+		}
+	});
+	submit.onclick = () => {
+		conn.send({
+			type: 'kick',
+			reason: input.value || 'Reason not given'
+		});
+		pList.delete(id);
+		updPList();
+		setTimeout(() => {
+			conn.close();
+		}, 10000);
+		cont.style.animation = 'hide .3s linear forwards';
+		setTimeout(() => {
+			cont.style.display = 'none';
+		}, 300);
+	}
+	cont.style.display = 'flex';
+	if (cont.style.opacity != 1) cont.style.animation = 'show .3s linear forwards';
+	input.focus();
 }
 function updPList() {
 	const el = document.querySelector('ul#plist');
@@ -17,7 +52,7 @@ function updPList() {
 		var btn = document.createElement('button');
 		btn.className = 'kick';
 		btn.onclick = () => {
-			rmPList(p.id);
+			pListKick(p.id);
 		}
 		btn.innerText = 'Kick'
 		e.appendChild(txt);

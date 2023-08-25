@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="darkreader-lock">
+		<meta name="robots" content="nofollow">
 		<title>Cards Against Humanity</title>
 		<link rel="stylesheet" href="index.css">
 		<link rel="icon" type="image/png" href="/img/favicon.png">
@@ -10,38 +11,52 @@
 	</head>
 	<body>
 		<noscript>
+			<!--TODO: add this to other pages-->
 			<h1>This app requires javascript :(</h1>
 		</noscript>
 		<div id="title">
 			<h1><span>Cards</span> <span>Against</span> <span>Humanity</span></h1>
 			<h3>Multiplayer edition</h3>
-			<button onclick="play()"><h1>Play</h1></button><br><br>
-			<button onclick="join()"><h1>Join a room</h1></button>
+			<button onclick="play()" class="btn"><h1>Play</h1></button><br><br>
+			<a href="/join"><button class="btn"><h1>Join a room</h1></button></a>
 		</div>
 		<div id="game">
 			<h1>Start game</h1>
 			<p id="stats"></p>
+			<h3>Packs</h3>
 			<input id="name" type="text" placeholder="Room name"><br><br>
-			<input onchange="base(this)" type="checkbox" name="base" checked>
+			<input class="pck" onchange="base(this)" type="checkbox" name="base" checked>
 			<label for="base">Base game (Reccomended) (1 pack)</label><br>
-			<input onchange="exp(this)" type="checkbox" name="exp">
+			<input class="pck" onchange="exp(this)" type="checkbox" name="exp">
 			<label for="exp">All box expansions (Reccomended) (11 packs)</label><br>
-			<input onchange="fam(this)" type="checkbox" name="fam">
+			<input class="pck" onchange="fam(this)" type="checkbox" name="fam">
 			<label for="fam">Family Edition (1 pack)</label><br>
-			<input onchange="pck(this)" type="checkbox" name="pck">
+			<input class="pck" onchange="pck(this)" type="checkbox" name="pck">
 			<label for="pck">All pack expansions (24 packs)</label><br>
-			<input onchange="pol(this)" type="checkbox" name="pol">
+			<input class="pck" onchange="pol(this)" type="checkbox" name="pol">
 			<label for="pol">All political expansions (5 packs)</label><br>
-			<input onchange="pax(this)" type="checkbox" name="pax">
+			<input class="pck" onchange="pax(this)" type="checkbox" name="pax">
 			<label for="pax">All PAX expansions (12 packs)</label><br>
-			<input onchange="ai(this)" type="checkbox" name="ai">
+			<input class="pck" onchange="ai(this)" type="checkbox" name="ai">
 			<label for="ai">All AI packs (2 packs)</label><br>
-			<input onchange="oth(this)" type="checkbox" name="oth">
+			<input class="pck" onchange="oth(this)" type="checkbox" name="oth">
 			<label for="oth">All other official packs (15 packs)</label><br>
-			<input onchange="unofficial(this)" type="checkbox" name="unofficial">
+			<input class="pck" onchange="unofficial(this)" type="checkbox" name="unofficial">
 			<label for="unofficial">All unofficial packs (134 packs)</label><br><br>
-			<button id="start" onclick="start();">Start hosting</button>
+			<button id="clrpcks" class="btn" onclick="clrPcks()">Clear packs</button>
+			
+			<h3>Server settings</h3>
+			<input onchange="eTurn(this)" type="checkbox" name="turn">
+			<label for="turn" title="Enabling TURN may fix connection issues">Use TURN servers</label>
+			<input onchange="" type="checkbox" name="private">
+			<label for="private">Private game</label>
+			<label for="pswd">Password</label>
+			<input type="password" name="pswd" id="pswd">
+			
+			<br><br>
+			<button id="start" class="btn" onclick="start();">Start hosting</button>
 		</div>
+		<script src="https://cdn.jsdelivr.net/gh/cookey-dev/notifs@latest/notifs.min.js"></script>
 		<script src="loadpacks.js"></script>
 		<script src="index.js"></script>
 	</body>

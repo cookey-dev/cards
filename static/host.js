@@ -1,48 +1,47 @@
+var joinAsPeer;
+var copyJoinLink;
+(async () => {
+var info;
+
+var notifs;
+window.onload = () => {
+	notifs = new Notifs();
+}
+const cds = new Cards(pList);
+const sock = io();
+
+info = JSON.parse(decodeURIComponent(atob(new URL(window.location.href).searchParams.get('i'))));
+var turn = !!(new URL(window.location.href).searchParams.get('turn'));
+var iceServers;
+if (turn) {
+	iceServers = await new Promise(r => {
+		const req = new XMLHttpRequest();
+		req.addEventListener('load', function() {
+			r(JSON.parse(this.responseText));
+		});
+		req.open('GET', 'https://rowan.metered.live/api/v1/turn/credentials?apiKey=92b29d86913fe54ddcd66c3e16a7ce88adad');
+		req.send();
+	});
+} else {
+	iceServers = [{
+        urls: "stun:stun.relay.metered.ca:80"
+    }];
+}
+
 const peer = new Peer({
 	host: window.location.hostname,
 	port: 443,
 	path: "/peer/server",
 	config: {
-		iceServers: [
-      		{
-        		urls: "stun:a.relay.metered.ca:80",
-      		},
-      		{
-        		urls: "turn:a.relay.metered.ca:80",
-        		username: "127830d23d52b2e9695b8315",
-        		credential: "9pgi6e1b428bcz55",
-      		},
-      		{
-        		urls: "turn:a.relay.metered.ca:80?transport=tcp",
-       			username: "127830d23d52b2e9695b8315",
-        		credential: "9pgi6e1b428bcz55",
-      		},
-      		{
-        		urls: "turn:a.relay.metered.ca:443",
-        		username: "127830d23d52b2e9695b8315",
-        		credential: "9pgi6e1b428bcz55",
-      		},
-      		{
-        		urls: "turn:a.relay.metered.ca:443?transport=tcp",
-        		username: "127830d23d52b2e9695b8315",
-        		credential: "9pgi6e1b428bcz55",
-      		}
-  		],
+		iceServers
 	}
 });
-
-var info;
-
-var joinAsPeer;
-var copyJoinLink;
-const cds = new Cards(pList);
-const sock = io();
-
+	
 peer.on('open', async id => {
+	notifs.info('Room open');
 	// Pre-game
-	info = JSON.parse(decodeURIComponent(atob(new URL(window.location.href).searchParams.get('i'))));
 	document.querySelector('title').innerText = `Hosting ${info.name}`;
-	const log = document.querySelector('p#info');
+	const log = document.querySelector('div#log');
 	
 	sock.on('error', err => {
 		alert(err);
@@ -52,6 +51,7 @@ peer.on('open', async id => {
 	sock.emit('host', {
 		id,
 		name: info.name,
+		turn: turn,
 		encrypted: false
 	});
 	
@@ -68,16 +68,14 @@ peer.on('open', async id => {
 	
 	var joinUrl = new URL(window.location.href);
 	joinUrl.pathname = '/join';
-	joinUrl.search = `?id=${id}`;
+	joinUrl.search = `?id=${id}` + (turn ? '&turn=1' : '');
 	joinUrl = joinUrl.href;
 	joinAsPeer = () => window.open(joinUrl, '_blank');
 	copyJoinLink = () => {
 		navigator.clipboard.writeText(joinUrl);
 	}
-
 	// Load packs
-	log.innerText = 'Loading packs'
-	await loadPacks(info.packs, log);
+	await loadPacks(info.packs);
 });
 
 function start() {
@@ -85,3 +83,4 @@ function start() {
 	cds.deal();
 	console.log([...pList.values()]);
 }
+})();

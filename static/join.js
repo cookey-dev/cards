@@ -1,4 +1,7 @@
 var rooms = null;
+var notifs;
+window.addEventListener('load', () => { notifs = new Notifs(); });
+var turn = !!(new URL(window.location.href).searchParams.get('turn'));
 
 function getUsername(id) {
 	return new Promise(r => {
@@ -13,14 +16,14 @@ function getUsername(id) {
 				ev.preventDefault();
 				submit.click();
 			}
-		})
+		});
 		submit.onclick = () => {
 			if (input.value.length < 1) {
-				alert('Username must be at least one character');
+				notifs.error('Username must be at least one character');
 			} else if (!rooms) {
-				alert('Rooms not loaded');
+				notifs.warn('Rooms not loaded');
 			} else if (!rooms.map(i => i.id).includes(id)) {
-				alert('Room doesn\'t exist');
+				notifs.error('Room doesn\'t exist');
 			} else {
 				r(input.value);
 			}
@@ -37,7 +40,7 @@ function join() {
 	if (this.encrypted) {
 	} else {
 		getUsername(this.id).then(user => {
-			url.search = `?id=${encodeURIComponent(this.id)}&name=${encodeURIComponent(user)}`;
+			url.search = `?id=${encodeURIComponent(this.id)}&name=${encodeURIComponent(user)}` + (turn ? '&turn=1' : '');
 			window.location.href = url.href;
 		});
 	}
