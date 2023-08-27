@@ -5,9 +5,13 @@ class Cards {
 	black;
 	hand;
 	conn;
-	constructor() {
+	peer;
+	name;
+	constructor(peer, conn) {
 		this.hand = [];
-		this.conn = null;
+		this.conn = conn;
+		this.name = null;
+		this.peer = peer;
 	}
 	deal(hand) {
 		this.hand = hand;
@@ -22,6 +26,13 @@ class Cards {
 		}
 		
 		this.fanCards();
+	}
+	setName(name) {
+		this.name = name;
+		this.conn.send({
+			type: 'name',
+			name
+		});
 	}
 	fanCards() {
 		const handEl = document.querySelector('div#hand');
@@ -72,7 +83,37 @@ class Cards {
 			window.location.href = joinUrl.href;
 		}, 5000);
 	}
-	handle(d, conn) {
+	getUsername(name) {
+		return new Promise(r => {
+			const cont = document.querySelector('div#pcont');
+			const prompt = document.querySelector('div#prompt');
+			const head = document.querySelector('h1#phead');
+			const input = document.querySelector('input#pinput');
+			const submit = document.querySelector('button#submit');
+			input.value = name;
+			input.addEventListener('keypress', ev => {
+				if (ev.key.toLowerCase() == 'enter') {
+					ev.preventDefault();
+					submit.click();
+				}
+			});
+			submit.onclick = () => {
+				if (input.value.length < 1) {
+					notifs.error('Username must be at least one character');
+				} else if (input.value == name) {
+					notifs.error('Choose a different name');
+				} else {
+					cont.style.animation = 'hide .3s linear forwards';
+					setTimeout(() => { cont.style.display = 'none'; }, 300);
+					r(input.value);
+				}
+			}
+			cont.style.display = 'flex';
+			if (cont.style.opacity != 1) cont.style.animation = 'show .3s linear forwards';
+			input.focus();
+		});
+	}
+	async handle(d, conn) {
 		console.log(d);
 		if (this.conn === null) this.conn = conn;
 		switch (d.type) {
@@ -90,13 +131,18 @@ class Cards {
 				break;
 			case 'name_conflict':
 				notifs.warn('Name is taken');
-				notifs
+				conn.send({
+					type: 'name',
+					name: await this.getUsername(this.name)
+				});
 				break;
 			case 'info':
 				console.log(d.info);
 				notifs.info(d.info);
 				break;
 			case 'deal':
+				peer.disconnect();
+				notifs.info('Peer is disconnecting from main server, game connection is intact');
 				this.deal(d.hand);
 				break;
 			case 'black':

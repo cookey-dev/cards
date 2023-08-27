@@ -1,14 +1,12 @@
 var joinAsPeer;
 var copyJoinLink;
+var cds;
 (async () => {
 var info;
 
 var notifs;
-window.onload = () => {
-	notifs = new Notifs();
-}
-const cds = new Cards(pList);
-const sock = io();
+window.addEventListener('load', () => { notifs = new Notifs(); });
+cds = new Cards(pList);
 
 info = JSON.parse(decodeURIComponent(atob(new URL(window.location.href).searchParams.get('i'))));
 var turn = !!(new URL(window.location.href).searchParams.get('turn'));
@@ -36,29 +34,60 @@ const peer = new Peer({
 		iceServers
 	}
 });
-	
+
+function post(url, data) {
+	return new Promise(r => {
+		const req = new XMLHttpRequest();
+		req.open('POST', url, true);
+		req.setRequestHeader('Content-Type', 'application/json');
+		req.addEventListener('load', function() {
+			r(this.responseText);
+		});
+		req.send(JSON.stringify(data));
+	});
+}
+function http(url) {
+	return new Promise(r => {
+		const req = new XMLHttpRequest();
+		req.open('GET', url);
+		req.addEventListener('load', function() {
+			r(this.responseText);
+		});
+		req.send();
+	});
+}
+
 peer.on('open', async id => {
-	notifs.info('Room open');
 	// Pre-game
+	const apId = await http('/api/id');
+	console.log(apId);
+	const evt = new EventSource(`/api/ev?id=${apId}`);
 	document.querySelector('title').innerText = `Hosting ${info.name}`;
 	const log = document.querySelector('div#log');
-	
-	sock.on('error', err => {
-		alert(err);
-		window.location.reload();
+	evt.addEventListener('err', err => {
+		notifs.error(err.data);
+		notifs.info('Reloading in 5 seconds');
+		setTimeout(window.location.reload, 5000);
 	});
-	console.log(id);
-	sock.emit('host', {
-		id,
+	await post('/api/host', {
+		id: apId,
 		name: info.name,
 		turn: turn,
 		encrypted: false
+	});
+	await new Promise(r => { evt.addEventListener('ok', r); });
+	console.log(id);
+	peer.on('error', err => {
+		notifs.error(err.message);
 	});
 	
 	peer.on('connection', conn => {
 		console.log(conn.peer);
 		conn.on('close', () => {
 			cds.remove(conn);
+		});
+		conn.on('error', err => {
+			notifs.error(err.message);
 		});
 		conn.on('data', d => {
 			console.log(d);
@@ -76,6 +105,7 @@ peer.on('open', async id => {
 	}
 	// Load packs
 	await loadPacks(info.packs);
+	notifs.info('Room ready');
 });
 
 function start() {

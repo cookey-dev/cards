@@ -64,9 +64,11 @@ function pListConflict(d, conn) {
 	if (pList.get(conn.peer)) {
 		conn.send({
 			type: 'sys_kick',
-			reason: 'Conflicting id (Internal error)'
+			reason: 'Conflicting connections (Internal error)'
 		});
-		conn.close();
+		setTimeout(() => {
+			if (pList.get(conn.peer)) conn.close();
+		}, 10000);
 		return true;
 	} else if ([...pList.values()].map(p => p.name).includes(d.name)) {
 		conn.send({
@@ -80,11 +82,17 @@ function pListConflict(d, conn) {
 			type: 'sys_kick',
 			reason: 'get kicked bogo'
 		});
+		setTimeout(() => {
+			if (pList.get(conn.peer)) conn.close();
+		}, 10000);
 		return true;
 	}
 	conn.send({
 		type: 'info',
 		info: 'Connected successfully'
+	});
+	conn.send({
+		type: 'connsuccess'
 	});
 	return false;
 }

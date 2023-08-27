@@ -35,12 +35,7 @@ class Cards {
 	handle(d, conn) {
 		sw: switch (d.type) {
 			case 'name':
-				if (pListConflict(d, conn)) {
-					setTimeout(() => {
-						if (pList.get(conn.peer)) conn.close();
-					}, 10000);
-					break sw;
-				}
+				if (pListConflict(d, conn)) break;
 				pList.set(conn.peer, {
 					conn,
 					id: conn.peer,

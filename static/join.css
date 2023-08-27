@@ -34,7 +34,7 @@ div#pcont {
 	width: 100%;
 	height: 100%;
 	backdrop-filter: blur(30px);
-	z-index: 99;
+	z-index: 98;
 	display: none;
 	opacity: 0;
 	align-items: center;

@@ -1,7 +1,22 @@
 var rooms = null;
 var notifs;
-window.addEventListener('load', () => { notifs = new Notifs(); });
 var turn = !!(new URL(window.location.href).searchParams.get('turn'));
+window.addEventListener('load', async () => {
+	notifs = new Notifs();
+	var url = new URL(window.location.href).searchParams;
+	rooms = (await getJSON('/api/rooms')).rooms;
+	if (url.get('id')) join.bind({
+		encrypted: false,
+		id: url.get('id')
+	})(rooms);
+	const rList = document.querySelector('ul#rooms');
+	const search = document.querySelector('input#name');
+	updRooms(rooms, rList);
+	search.addEventListener('input', e => {
+		console.log(e.target.value);
+		updRooms(rooms.filter(r => r.name.startsWith(e.target.value)), rList);
+	});
+});
 
 function getUsername(id) {
 	return new Promise(r => {
@@ -58,20 +73,4 @@ function updRooms(rooms, rList) {
 		li.onclick = join.bind(r);
 		rList.appendChild(li);
 	}
-}
-
-window.onload = async () => {
-	var url = new URL(window.location.href).searchParams;
-	rooms = (await getJSON('/api/rooms')).rooms;
-	if (url.get('id')) join.bind({
-		encrypted: false,
-		id: url.get('id')
-	})(rooms);
-	const rList = document.querySelector('ul#rooms');
-	const search = document.querySelector('input#name');
-	updRooms(rooms, rList);
-	search.addEventListener('input', e => {
-		console.log(e.target.value);
-		updRooms(rooms.filter(r => r.name.startsWith(e.target.value)), rList);
-	});
 }

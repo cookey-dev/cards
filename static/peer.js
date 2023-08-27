@@ -1,36 +1,4 @@
-function getUsername(id, name) {
-	return new Promise(r => {
-		const cont = document.querySelector('div#pcont');
-		const prompt = document.querySelector('div#prompt');
-		const head = document.querySelector('h1#phead');
-		const input = document.querySelector('input#pinput');
-		const submit = document.querySelector('button#submit');
-		input.value = name;
-		input.addEventListener('keypress', ev => {
-			if (ev.key.toLowerCase() == 'enter') {
-				ev.preventDefault();
-				submit.click();
-			}
-		});
-		submit.onclick = () => {
-			if (input.value.length < 1) {
-				notifs.error('Username must be at least one character');
-			} else if (!rooms) {
-				notifs.warn('Rooms not loaded');
-			} else if (!rooms.map(i => i.id).includes(id)) {
-				notifs.error('Room doesn\'t exist');
-			} else if (input.value == name) {
-				notifs.error('Choose a different name');
-			} else {
-				r(input.value);
-			}
-		}
-		cont.style.display = 'flex';
-		if (cont.style.opacity != 1) cont.style.animation = 'show .3s linear forwards';
-		input.focus();
-	});
-}
-
+var cds;
 (async () => {
 var turn = !!(new URL(window.location.href).searchParams.get('turn'));
 var iceServers;
@@ -58,17 +26,18 @@ const peer = new Peer({
 });
 peer.on('open', async id => {
 	const search = new URL(window.location.href).searchParams;
+	const name = decodeURIComponent(search.get('name'));
 	console.log(id);
-	var cds = new Cards();
 	const conn = peer.connect(search.get('id'));
 	await new Promise(r => conn.on('open', r));
-	conn.on('data', d => {
+	cds = new Cards(peer, conn);
+	conn.on('error', err => {
+		notifs.error(err.message);
+	});
+	conn.on('data', async d => {
 		console.log(d);
-		cds.handle(d, conn);
+		await cds.handle(d, conn);
 	});
-	conn.send({
-		type: 'name',
-		name: decodeURIComponent(search.get('name'))
-	});
+	cds.setName(name);
 });
 })();

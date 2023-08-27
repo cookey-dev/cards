@@ -1,13 +1,13 @@
 var notifs;
 var turn = false;
-window.onload = () => {
+window.addEventListener('load', () => {
 	notifs = new Notifs();
 	loadPacks().then(() => {
 		const game = document.querySelector('div#game');
 		const stats = document.querySelector('div#game > p#stats');
 		stats.innerText = `Packs: ${packs.official.length} official, ${packs.unofficial.length} unofficial`;
 	});
-}
+});
 
 const deconcat = (src, rem) => src.filter(it => !rem.includes(it));
 
