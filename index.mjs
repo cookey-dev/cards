@@ -1,7 +1,6 @@
 import http from 'node:http';
 import bp from 'body-parser';
 import express from 'express';
-import Database from '@replit/database';
 import { ExpressPeerServer } from 'peer';
 import { EventEmitter } from 'node:events';
 import { readFileSync as rf } from 'node:fs';
@@ -19,12 +18,26 @@ const peer = ExpressPeerServer(server, {
 });
 app.use("/peer", peer);
 
-var hosts = new Database();
-var evs = {};
+var hosts = {};
 
-async function rooms() {
-	const l = await hosts.list();
-	return Promise.all(l.map(k => hosts.get(k)));
+function flush() {
+	const now = Date.now();
+	const l = Object.keys(hosts);
+	for (var _r of l) {
+		try {
+			const r = hosts[_r];
+			if (r.expires <= now || !r.expires) {
+				if (hosts[_r]) delete hosts[_r];
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}
+}
+flush();
+setInterval(flush, 60 * 60 * 1000);
+function rooms() {
+	return Object.values(hosts);
 }
 
 app.get('/', (req, res) => {
@@ -53,63 +66,79 @@ app.get('/api/rooms', async (req, res) => {
 		rooms: await rooms()
 	});
 });
-app.post('/api/host', async (req, res) => {
+app.post('/api/host', (req, res) => {
 	try {
 		var host = req.body;
 		console.log(host);
-		if ((await rooms()).map(r => r.name).includes(host.name)) {
-			(await hosts.get(host.id)).ev.emit('error', 'Name is taken');
+		if (rooms().map(r => r.name).includes(host.name)) {
+			hosts[host.apId].ev.emit('error', 'Name is taken');
 		} else {
-			hosts.set(host.id, {
+			hosts[host.apId] = {
 				...host,
-				...await hosts.get(host.id)
-			});
-			evs[id].emit('ok');
+				...hosts[host.apId]
+			}
+			hosts[host.apId].ev.emit('ok');
 		}
+		res.send('ok');
 	} catch (err) {
 		console.error(err);
 		try {
-			await hosts.delete(host.id);
+			delete hosts[host.apId];
 		} catch {};
 	}
 });
-app.get('/api/id', async (req, res) => {
-	const id = rand(4).toString('hex');
-	console.log(id)
-	await hosts.set(id, {});
-	evs[id] = new EventEmitter();
-	res.send(id);
-});
-app.get('/api/ev', async (req, res) => {
-	res.set({
-		'Cache-Control': 'no-cache',
-		'Content-Type': 'text/event-stream',
-		'Access-Control-Allow-Origin': '*',
-		'Connection': 'keep-alive'
-	});
-	res.flushHeaders();
-	const id = req.query.id;
-	console.log(id);
-	res.write('event: id\n');
-	res.write(`data: ${id}\n\n`);
-	evs[id].on('error', err => {
-		res.write('event: err\n');
-		res.write(`data: ${err}\n\n`);
-	});
-	evs[id].on('ok', () => {
-		res.write('event: ok\n');
-		res.write('data: ok\n\n');
-	});
-	res.on('close', async () => {
-		res.end();
-		try {
-			console.log('disconnect');
-			//console.log(hosts.get(host.name), host)
-			await hosts.delete(host.name);
-		} catch (err) {
-			console.error(err);
+app.get('/api/id', (req, res) => {
+	try {
+		const id = rand(4).toString('hex');
+		console.log(id)
+		hosts[id] = {
+			expires: Date.now() + (24 * 60 * 60 * 1000),
+			ev: new EventEmitter()
 		}
-	});
+		console.log(hosts[id]);
+		res.send(id);
+	} catch (err) {
+		console.error(err);
+	}
+});
+app.get('/api/ev', (req, res) => {
+	try {
+		res.set({
+			'Cache-Control': 'no-cache',
+			'Content-Type': 'text/event-stream',
+			'Access-Control-Allow-Origin': '*',
+			'Connection': 'keep-alive'
+		});
+		res.flushHeaders();
+		const id = req.query.id;
+		console.log(id);
+		res.write('event: id\n');
+		res.write(`data: ${id}\n\n`);
+		console.log(hosts[id]);
+		hosts[id].ev.on('error', err => {
+			res.write('event: err\n');
+			res.write(`data: ${err}\n\n`);
+		});
+		hosts[id].ev.on('ok', () => {
+			console.log('ok');
+			res.write('event: ok\n');
+			res.write('data: ok\n\n');
+		});
+		res.on('close', () => {
+			res.end();
+			try {
+				console.log('disconnect');
+				//console.log(hosts.get(host.name), host)
+				delete hosts[id];
+			} catch (err) {
+				console.error(err);
+			}
+		});
+	} catch (err) {
+		try { res.end(); } catch {};
+		try { delete hosts[id] } catch {};
+		console.error(err);
+	}
 });
 
 server.listen(443, () => {

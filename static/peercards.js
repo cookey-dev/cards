@@ -141,7 +141,7 @@ class Cards {
 				notifs.info(d.info);
 				break;
 			case 'deal':
-				peer.disconnect();
+				this.peer.disconnect();
 				notifs.info('Peer is disconnecting from main server, game connection is intact');
 				this.deal(d.hand);
 				break;

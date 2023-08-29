@@ -1,6 +1,8 @@
 var joinAsPeer;
 var copyJoinLink;
 var cds;
+var start;
+var evt;
 (async () => {
 var info;
 
@@ -61,22 +63,25 @@ peer.on('open', async id => {
 	// Pre-game
 	const apId = await http('/api/id');
 	console.log(apId);
-	const evt = new EventSource(`/api/ev?id=${apId}`);
+	evt = new EventSource(`/api/ev?id=${apId}`);
+	await new Promise(r => { evt.addEventListener('open', r); });
 	document.querySelector('title').innerText = `Hosting ${info.name}`;
 	const log = document.querySelector('div#log');
 	evt.addEventListener('err', err => {
 		notifs.error(err.data);
 		notifs.info('Reloading in 5 seconds');
-		setTimeout(window.location.reload, 5000);
+		setTimeout(() => { window.location.reload(); }, 5000);
 	});
-	await post('/api/host', {
-		id: apId,
+	post('/api/host', {
+		apId,
+		id,
 		name: info.name,
 		turn: turn,
 		encrypted: false
 	});
 	await new Promise(r => { evt.addEventListener('ok', r); });
 	console.log(id);
+	notifs.info('Room registered');
 	peer.on('error', err => {
 		notifs.error(err.message);
 	});
@@ -108,8 +113,8 @@ peer.on('open', async id => {
 	notifs.info('Room ready');
 });
 
-function start() {
-	sock.close();
+start = () => {
+	evt.close();
 	cds.deal();
 	console.log([...pList.values()]);
 }
