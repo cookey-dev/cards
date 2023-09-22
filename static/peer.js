@@ -1,5 +1,6 @@
 var cds;
 (async () => {
+if (!Cookies.get('uuid')) Cookies.set('uuid', crypto.randomUUID(), { expires: 7 });
 var turn = !!(new URL(window.location.href).searchParams.get('turn'));
 var iceServers;
 if (turn) {
@@ -30,7 +31,7 @@ peer.on('open', async id => {
 	console.log(id);
 	const conn = peer.connect(search.get('id'));
 	await new Promise(r => conn.on('open', r));
-	cds = new Cards(peer, conn);
+	cds = new Cards(peer, conn, Cookies.get('uuid'));
 	conn.on('error', err => {
 		notifs.error(err.message);
 	});

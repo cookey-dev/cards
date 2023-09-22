@@ -6,12 +6,16 @@ class Cards {
 	hand;
 	conn;
 	peer;
+	uuid;
 	name;
-	constructor(peer, conn) {
+	czar;
+	constructor(peer, conn, uuid) {
 		this.hand = [];
 		this.conn = conn;
+		this.uuid = uuid;
 		this.name = null;
 		this.peer = peer;
+		this.czar = false;
 	}
 	deal(hand) {
 		this.hand = hand;
@@ -43,6 +47,7 @@ class Cards {
 			ch.style.zIndex = i.toString();
 			ch.addEventListener('click', function() {
 				for (var c of handEl.children) {
+					console.log(c,this);
 					if (c === this) continue;
 					this.style.animation = 'lowercard .2s ease-out forwards';
 				}
@@ -113,6 +118,9 @@ class Cards {
 			input.focus();
 		});
 	}
+	showBlack(card) {
+		
+	}
 	async handle(d, conn) {
 		console.log(d);
 		if (this.conn === null) this.conn = conn;
@@ -145,7 +153,12 @@ class Cards {
 				notifs.info('Peer is disconnecting from main server, game connection is intact');
 				this.deal(d.hand);
 				break;
+			case 'refill':
+				break;
+			case 'czar':
+				this.czar = true;
 			case 'black':
+				if (this.czar == true) this.showBlack(d.card);
 				break;
 		}
 	}
